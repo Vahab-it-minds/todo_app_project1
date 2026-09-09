@@ -60,6 +60,33 @@ namespace backend.repositories
             }
         }
 
+        public async Task<List<User>> GetAllUsers()
+        {
+            await using var connection = await database.GetConnection();
+
+            const string sql = """
+            SELECT id, name, email
+            FROM users;
+            """;
+
+            await using var command= new NpgsqlCommand(sql, connection);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            
+            var users = new List<User>();
+
+            while(await reader.ReadAsync())
+            {
+                var id = reader.GetInt32(0);
+                var name = reader.GetString(1);
+                var email = reader.GetString(2);
+
+                users.Add(new User(id, name, email));
+            }
+
+            return users;
+        }
+
         public async Task UpdateUser(User user)
         {
             await using var connection = await database.GetConnection();
@@ -76,6 +103,22 @@ namespace backend.repositories
             command.Parameters.AddWithValue("@name", user.Name);
             command.Parameters.AddWithValue("@email", user.Email);
             command.Parameters.AddWithValue("@password", user.Password!);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task DeleteUser(int id)
+        {
+            await using var connection = await database.GetConnection();
+
+            const string sql = """
+                DELETE FROM users
+                WHERE id = @id;
+                """;
+
+            await using var command = new NpgsqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("id", id);
 
             await command.ExecuteNonQueryAsync();
         }
