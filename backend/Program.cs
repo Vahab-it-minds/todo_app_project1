@@ -10,6 +10,6 @@ await using var connection = await database.GetConnection();
 
 var userRepository = new UserRepositories(database);
 
+var todoRepository = new TodoRepository(database);
 
 
-Console.WriteLine("Database connected!");
