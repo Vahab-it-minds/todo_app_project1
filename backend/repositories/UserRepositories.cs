@@ -87,6 +87,37 @@ namespace backend.repositories
             return users;
         }
 
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            await using var connection = await database.GetConnection();
+
+            const string sql = """
+                SELECT id, name, email, password
+                FROM users
+                WHERE email = @email;
+            """;
+
+            await using var command = new NpgsqlCommand(sql, connection);
+            
+            command.Parameters.AddWithValue("@email", email);
+
+            await using var reader = await command.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                var id = reader.GetInt32(0);
+                var name = reader.GetString(1);
+                var userEmail = reader.GetString(2);
+                var password = reader.GetString(3);
+
+                return new User(id, name, userEmail, password);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public async Task UpdateUser(User user)
         {
             await using var connection = await database.GetConnection();
