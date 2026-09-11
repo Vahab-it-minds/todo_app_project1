@@ -2,14 +2,60 @@
 using backend.classes;
 using backend.repositories;
 using backend.security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 DotNetEnv.Env.Load("../.env");
 
-var database = new Database();
+var builder = WebApplication.CreateBuilder(args);
 
-await using var connection = await database.GetConnection();
+builder.Services.AddSingleton<Database>();
 
-var userRepository = new UserRepositories(database);
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<TodoRepository>();
 
-var todoRepository = new TodoRepository(database);
+builder.Services.AddScoped<PasswordHasherService>();
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<AuthService>();
+
+
+
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET")!;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(secretKey)
+            ),
+
+            ValidateIssuer = true,
+            ValidIssuer = "todo-api",
+
+            ValidateAudience = true,
+            ValidAudience = "todo-client",
+
+            ValidateLifetime = true
+        };
+    });
+
+
+builder.Services.AddAuthorization();
+var app = builder.Build();
+app.UseAuthentication();
+app.UseAuthorization();
+
+
+app.MapGet("/protected", () => "You are authenticated!")
+    .RequireAuthorization();
+
+
+
+
 

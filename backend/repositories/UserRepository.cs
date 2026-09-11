@@ -4,11 +4,11 @@ using Npgsql;
 
 namespace backend.repositories
 {
-    public class UserRepositories
+    public class UserRepository
     {
         private readonly Database database;
 
-        public UserRepositories(Database database)
+        public UserRepository(Database database)
         {
             this.database = database;
         }
