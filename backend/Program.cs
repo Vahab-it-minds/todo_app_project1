@@ -5,6 +5,7 @@ using backend.security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using backend.models;
 
 DotNetEnv.Env.Load("../.env");
 
@@ -56,6 +57,16 @@ app.MapGet("/protected", () => "You are authenticated!")
     .RequireAuthorization();
 
 
+app.MapPost("/auth/login", async (LoginRequest request, AuthService authService) =>
+{
+    var token = await authService.Login(request.Email, request.Password);
 
+    if (token == null)
+    {
+        return Results.Unauthorized();
+    }
 
+    return Results.Ok(new { token });
+});
 
+app.Run();
