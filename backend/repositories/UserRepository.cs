@@ -19,12 +19,11 @@ namespace backend.repositories
             await using var connection = await database.GetConnection();
 
             const string sql ="""
-                INSERT INTO users (id,name, email, password)
-                VALUES (@Id, @Name, @Email, @Password);
+                INSERT INTO users (name, email, password)
+                VALUES (@Name, @Email, @Password);
             """;
 
             await using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@Id", user.Id);
             command.Parameters.AddWithValue("@Name", user.Name);
             command.Parameters.AddWithValue("@Email", user.Email);
             command.Parameters.AddWithValue("@Password", user.Password!);
@@ -152,6 +151,25 @@ namespace backend.repositories
             command.Parameters.AddWithValue("id", id);
 
             await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task<bool> EmailExists(string email)
+        {
+            await using var connection = await database.GetConnection();
+
+            const string sql = """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM users
+                WHERE email = @Email
+            );
+            """;
+
+            await using var command = new NpgsqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@Email", email);
+
+            return (bool)(await command.ExecuteScalarAsync())!;
         }
     }
 

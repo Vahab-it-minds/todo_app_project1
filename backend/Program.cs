@@ -19,6 +19,7 @@ builder.Services.AddScoped<TodoRepository>();
 builder.Services.AddScoped<PasswordHasherService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<SignupService>();
 
 
 
@@ -67,6 +68,23 @@ app.MapPost("/auth/login", async (LoginRequest request, AuthService authService)
     }
 
     return Results.Ok(new { token });
+});
+
+
+app.MapPost("/auth/signup", async (SignupRequest request, SignupService signupService) =>
+{
+    var success = await signupService.Signup(
+        request.Name,
+        request.Email,
+        request.Password
+    );
+
+    if (!success)
+    {
+        return Results.Conflict("Email already exists.");
+    }
+
+    return Results.Ok("User created successfully.");
 });
 
 app.Run();
