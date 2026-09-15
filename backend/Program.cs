@@ -1,11 +1,11 @@
 ﻿using backend.data;
-using backend.classes;
 using backend.repositories;
 using backend.security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using backend.models;
+using System.Text.Json.Serialization;
+using backend.endpoints;
 
 DotNetEnv.Env.Load("../.env");
 
@@ -23,7 +23,12 @@ builder.Services.AddScoped<SignupService>();
 
 
 
-
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(
+        new JsonStringEnumConverter()
+    );
+});
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -50,41 +55,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 var app = builder.Build();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-app.MapGet("/protected", () => "You are authenticated!")
-    .RequireAuthorization();
-
-
-app.MapPost("/auth/login", async (LoginRequest request, AuthService authService) =>
-{
-    var token = await authService.Login(request.Email, request.Password);
-
-    if (token == null)
-    {
-        return Results.Unauthorized();
-    }
-
-    return Results.Ok(new { token });
-});
-
-
-app.MapPost("/auth/signup", async (SignupRequest request, SignupService signupService) =>
-{
-    var success = await signupService.Signup(
-        request.Name,
-        request.Email,
-        request.Password
-    );
-
-    if (!success)
-    {
-        return Results.Conflict("Email already exists.");
-    }
-
-    return Results.Ok("User created successfully.");
-});
+app.MapTodoEndpoints();
+app.MapAuthEndpoints();
 
 app.Run();

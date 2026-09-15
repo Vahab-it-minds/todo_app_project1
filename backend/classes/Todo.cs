@@ -9,17 +9,17 @@ namespace backend.classes{
     public class Todo {
         public int Id { get; private set; }
         public string Title { get; private set; }
-        public string Description { get; private set; }
+        public string? Description { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
-        public DateTime DueDate { get; private set; }
+        public DateTime? DueDate { get; private set; }
         public int UserId { get; private set; }
         public Priority Priority { get; private set; }
-        public int TimeEstimate { get; private set; }
-        public string Category { get; private set; }
+        public int? TimeEstimate { get; private set; }
+        public string? Category { get; private set; }
         public bool IsCompleted { get; private set; }
 
-        public Todo(int id, string title, string description, DateTime createdAt, DateTime updatedAt, DateTime dueDate, int userId, Priority priority, int timeEstimate, string category, bool isCompleted) {
+        public Todo(int id, string title, string? description, DateTime createdAt, DateTime updatedAt, DateTime? dueDate, int userId, Priority priority, int? timeEstimate, string? category, bool isCompleted) {
             Id = id;
             Title = title;
             Description = description;
@@ -37,7 +37,7 @@ namespace backend.classes{
             Title = title;
         }
 
-        public void SetDescription(string description) {
+        public void SetDescription(string? description) {
             Description = description;
         }
 
@@ -45,7 +45,7 @@ namespace backend.classes{
             UpdatedAt = updatedAt;
         }
 
-        public void SetDueDate(DateTime dueDate) {
+        public void SetDueDate(DateTime? dueDate) {
             DueDate = dueDate;
         }
 
@@ -53,11 +53,11 @@ namespace backend.classes{
             Priority = priority;
         }
 
-        public void SetTimeEstimate(int timeEstimate) {
+        public void SetTimeEstimate(int? timeEstimate) {
             TimeEstimate = timeEstimate;
         }
 
-        public void SetCategory(string category) {
+        public void SetCategory(string? category) {
             Category = category;
         }
 
