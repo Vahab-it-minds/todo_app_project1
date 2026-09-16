@@ -74,7 +74,7 @@ namespace backend.endpoints
                     request.Priority,
                     request.TimeEstimate,
                     request.Category,
-                    false
+                    TodoStatus.Todo
                 );
 
                 await todoRepository.CreateTodo(todo);
@@ -113,7 +113,7 @@ namespace backend.endpoints
                 todo.SetPriority(request.Priority);
                 todo.SetTimeEstimate(request.TimeEstimate);
                 todo.SetCategory(request.Category);
-                todo.SetIsCompleted(request.IsCompleted);
+                todo.SetStatus(request.Status);
 
                 await todoRepository.UpdateTodo(todo);
 

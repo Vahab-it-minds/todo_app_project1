@@ -19,10 +19,10 @@ namespace backend.repositories
 
             const string sql = """
             INSERT INTO todos (
-            title, description, created_at, updated_at, due_date, user_id, priority, time_estimate, category, is_completed
+            title, description, created_at, updated_at, due_date, user_id, priority, time_estimate, category, status
             )
             VALUES(
-            @Title, @Description, @CreatedAt, @UpdatedAt, @DueDate, @UserId, @Priority, @TimeEstimate, @Category, @IsCompleted
+            @Title, @Description, @CreatedAt, @UpdatedAt, @DueDate, @UserId, @Priority, @TimeEstimate, @Category, @Status
             )
             RETURNING id;
             """;
@@ -38,7 +38,7 @@ namespace backend.repositories
             command.Parameters.AddWithValue("@Priority", todo.Priority.ToString());
             command.Parameters.AddWithValue("@TimeEstimate", (object?)todo.TimeEstimate ?? DBNull.Value);
             command.Parameters.AddWithValue("@Category", (object?)todo.Category ?? DBNull.Value);
-            command.Parameters.AddWithValue("@IsCompleted", todo.IsCompleted);
+            command.Parameters.AddWithValue("@Status", todo.Status.ToString());
 
             
             await command.ExecuteNonQueryAsync();
@@ -49,7 +49,7 @@ namespace backend.repositories
             await using var connection = await database.GetConnection();
 
             const string sql = """
-            SELECT id, title, description, created_at, updated_at, due_date, user_id, priority, time_estimate, category, is_completed
+            SELECT id, title, description, created_at, updated_at, due_date, user_id, priority, time_estimate, category, status
             FROM todos
             WHERE id = @Id
             """;
@@ -72,9 +72,9 @@ namespace backend.repositories
                 var priority = Enum.Parse<Priority>(reader.GetString(7));
                 var timeEstimate = reader.IsDBNull(8) ? (int?)null : reader.GetInt32(8);
                 var category = reader.IsDBNull(9) ? null : reader.GetString(9);
-                var isCompleted = reader.GetBoolean(10);
+                var status = Enum.Parse<TodoStatus>(reader.GetString(10));
 
-                return new Todo(todoId, title, description, createdAt, updatedAt, dueDate, userId, priority, timeEstimate, category, isCompleted);
+                return new Todo(todoId, title, description, createdAt, updatedAt, dueDate, userId, priority, timeEstimate, category, status);
             }
 
             return null;
@@ -86,7 +86,7 @@ namespace backend.repositories
             await using var connection = await database.GetConnection();
 
             const string sql = """
-            SELECT id, title, description, created_at, updated_at, due_date, user_id, priority, time_estimate, category, is_completed
+            SELECT id, title, description, created_at, updated_at, due_date, user_id, priority, time_estimate, category, status
             FROM todos
             WHERE user_id = @UserId
             """;
@@ -111,7 +111,7 @@ namespace backend.repositories
                 var priority = Enum.Parse<Priority>(reader.GetString(7));
                 var timeEstimate = reader.IsDBNull(8) ? (int?)null : reader.GetInt32(8);
                 var category = reader.IsDBNull(9) ? null : reader.GetString(9);
-                var isCompleted = reader.GetBoolean(10);
+                var status = Enum.Parse<TodoStatus>(reader.GetString(10));
 
                 todos.Add(new Todo(
                     id,
@@ -124,7 +124,7 @@ namespace backend.repositories
                     priority,
                     timeEstimate,
                     category,
-                    isCompleted
+                    status
                 ));
             }
 
@@ -149,7 +149,7 @@ namespace backend.repositories
                 priority = @Priority,
                 time_estimate = @TimeEstimate,
                 category = @Category,
-                is_completed = @IsCompleted
+                status = @Status
             WHERE id = @Id
             """;
 
@@ -163,7 +163,7 @@ namespace backend.repositories
             command.Parameters.AddWithValue("@Priority", todo.Priority.ToString());
             command.Parameters.AddWithValue("@TimeEstimate", (object?)todo.TimeEstimate ?? DBNull.Value);
             command.Parameters.AddWithValue("@Category", (object?)todo.Category ?? DBNull.Value);
-            command.Parameters.AddWithValue("@IsCompleted", todo.IsCompleted);
+            command.Parameters.AddWithValue("@Status", todo.Status.ToString());
 
             await command.ExecuteNonQueryAsync();
         }

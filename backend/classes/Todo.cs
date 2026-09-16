@@ -1,12 +1,21 @@
-namespace backend.classes{
+namespace backend.classes
+{
     public enum Priority
     {
         Low,
         Medium,
         High
     }
-    
-    public class Todo {
+
+    public enum TodoStatus
+    {
+        Todo,
+        InProgress,
+        Done
+    }
+
+    public class Todo
+    {
         public int Id { get; private set; }
         public string Title { get; private set; }
         public string? Description { get; private set; }
@@ -17,9 +26,21 @@ namespace backend.classes{
         public Priority Priority { get; private set; }
         public int? TimeEstimate { get; private set; }
         public string? Category { get; private set; }
-        public bool IsCompleted { get; private set; }
+        public TodoStatus Status { get; private set; }
 
-        public Todo(int id, string title, string? description, DateTime createdAt, DateTime updatedAt, DateTime? dueDate, int userId, Priority priority, int? timeEstimate, string? category, bool isCompleted) {
+        public Todo(
+            int id,
+            string title,
+            string? description,
+            DateTime createdAt,
+            DateTime updatedAt,
+            DateTime? dueDate,
+            int userId,
+            Priority priority,
+            int? timeEstimate,
+            string? category,
+            TodoStatus status)
+        {
             Id = id;
             Title = title;
             Description = description;
@@ -30,40 +51,47 @@ namespace backend.classes{
             Priority = priority;
             TimeEstimate = timeEstimate;
             Category = category;
-            IsCompleted = isCompleted;
+            Status = status;
         }
 
-        public void SetTitle(string title) {
+        public void SetTitle(string title)
+        {
             Title = title;
         }
 
-        public void SetDescription(string? description) {
+        public void SetDescription(string? description)
+        {
             Description = description;
         }
 
-        public void SetUpdatedAt(DateTime updatedAt) {
+        public void SetUpdatedAt(DateTime updatedAt)
+        {
             UpdatedAt = updatedAt;
         }
 
-        public void SetDueDate(DateTime? dueDate) {
+        public void SetDueDate(DateTime? dueDate)
+        {
             DueDate = dueDate;
         }
 
-        public void SetPriority(Priority priority) {
+        public void SetPriority(Priority priority)
+        {
             Priority = priority;
         }
 
-        public void SetTimeEstimate(int? timeEstimate) {
+        public void SetTimeEstimate(int? timeEstimate)
+        {
             TimeEstimate = timeEstimate;
         }
 
-        public void SetCategory(string? category) {
+        public void SetCategory(string? category)
+        {
             Category = category;
         }
 
-        public void SetIsCompleted(bool isCompleted) {
-            IsCompleted = isCompleted;
+        public void SetStatus(TodoStatus status)
+        {
+            Status = status;
         }
-           
     }
 }

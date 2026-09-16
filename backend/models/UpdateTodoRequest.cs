@@ -10,6 +10,6 @@ namespace backend.models
         public Priority Priority { get; set; }
         public int? TimeEstimate { get; set; }
         public string? Category { get; set; }
-        public bool IsCompleted { get; set; }
+        public TodoStatus Status { get; set; }
     }
 }
