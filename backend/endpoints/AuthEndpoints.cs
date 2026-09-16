@@ -1,5 +1,6 @@
 using backend.models;
 using backend.security;
+using System.Security.Claims;
 
 namespace backend.endpoints
 {
@@ -9,7 +10,8 @@ namespace backend.endpoints
         {
             app.MapPost("/auth/login", async (
                 LoginRequest request,
-                AuthService authService) =>
+                AuthService authService,
+                HttpContext httpContext) =>
             {
                 var token = await authService.Login(
                     request.Email,
@@ -21,7 +23,19 @@ namespace backend.endpoints
                     return Results.Unauthorized();
                 }
 
-                return Results.Ok(new { token });
+                httpContext.Response.Cookies.Append(
+                    "access_token",
+                    token,
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = false,
+                        SameSite = SameSiteMode.Lax,
+                        Expires = DateTimeOffset.UtcNow.AddHours(1)
+                    }
+                );
+
+                return Results.Ok();
             });
 
             app.MapPost("/auth/signup", async (
@@ -40,6 +54,29 @@ namespace backend.endpoints
                 }
 
                 return Results.Ok("User created successfully.");
+            });
+
+            app.MapGet("/auth/me", (ClaimsPrincipal user) =>
+            {
+                var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? user.FindFirst("sub")?.Value;
+
+                var email = user.FindFirst(ClaimTypes.Email)?.Value
+                    ?? user.FindFirst("email")?.Value;
+
+                return Results.Ok(new
+                {
+                    id,
+                    email
+                });
+            })
+            .RequireAuthorization();
+
+            app.MapPost("/auth/logout", (HttpContext httpContext) =>
+            {
+                httpContext.Response.Cookies.Delete("access_token");
+
+                return Results.Ok();
             });
         }
     }

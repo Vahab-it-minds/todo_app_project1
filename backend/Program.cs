@@ -50,6 +50,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
             ValidateLifetime = true
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["access_token"];
+                return Task.CompletedTask;
+            }
+        };
 });
 
 builder.Services.AddCors(options =>
@@ -59,7 +68,8 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
             });
 });
 

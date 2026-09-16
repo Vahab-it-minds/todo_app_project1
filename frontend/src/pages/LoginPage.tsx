@@ -1,41 +1,29 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+import { login } from '../services/auth'
+
 
 function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setError('')
+async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault()
+  setError('')
 
-    try {
-      const response = await fetch('http://localhost:5000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      })
+  try {
+    await login(email, password)
 
-      if (!response.ok) {
-        setError('Invalid email or password.')
-        return
-      }
-
-      const data = await response.json()
-
-      localStorage.setItem('token', data.token)
-
-      console.log('Login successful')
-    } catch (error) {
-      console.error(error)
-      setError('Could not connect to the server.')
-    }
+    navigate({
+      to: '/dashboard',
+    })
+  } catch (error) {
+    console.error(error)
+    setError('Invalid email or password.')
   }
+}
 
   return (
     <div className="login-container">
