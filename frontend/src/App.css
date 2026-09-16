@@ -1,0 +1,133 @@
+body {
+  margin: 0;
+  background-color: #0c0818;
+  font-family: Inter, Arial, sans-serif;
+  color: #ffffff;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 320px;
+}
+
+/* Heading */
+
+.login-container h1 {
+  margin: 0 0 6px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 36px;
+}
+
+.login-container > p:first-of-type {
+  margin: 0 0 32px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Form fields */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #221540;
+  border: 1px solid #2d1f52;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: #7c6ff7;
+}
+
+/* Forgot password */
+
+.login-container form > a {
+  display: block;
+  margin-top: 16px;
+  margin-bottom: 20px;
+  color: #7c6ff7;
+  font-size: 12px;
+  text-align: right;
+  text-decoration: none;
+}
+
+.login-container form > a:hover {
+  text-decoration: underline;
+}
+
+/* Login error */
+
+.login-error {
+  color: #f87171;
+  font-size: 12px;
+  margin: 0 0 16px;
+}
+
+/* Login button */
+
+.login-container button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  background-color: #7c6ff7;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-container button:hover {
+  opacity: 0.9;
+}
+
+/* Sign-up */
+
+.login-container > p:last-of-type {
+  margin-top: 28px;
+  margin-bottom: 0;
+  color: #9ca3af;
+  font-size: 12px;
+  text-align: center;
+}
+
+.login-container > p:last-of-type a {
+  color: #7c6ff7;
+  text-decoration: none;
+}
+
+.login-container > p:last-of-type a:hover {
+  text-decoration: underline;
+}
