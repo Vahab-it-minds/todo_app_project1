@@ -26,6 +26,15 @@ export type Todo = {
   status: TodoStatus
 }
 
+export type CreateTodoRequest = {
+  title: string
+  description: string | null
+  dueDate: string | null
+  priority: Priority
+  timeEstimate: number | null
+  category: string | null
+}
+
 
 export async function getTodos(): Promise<Todo[]> {
   const response = await fetch(`${API_URL}/todos`, {
@@ -34,6 +43,26 @@ export async function getTodos(): Promise<Todo[]> {
 
   if (!response.ok) {
     throw new Error('Failed to fetch todos.')
+  }
+
+  return response.json()
+}
+
+
+export async function createTodo(
+  todo: CreateTodoRequest
+): Promise<Todo> {
+  const response = await fetch(`${API_URL}/todos`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(todo),
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to create todo.')
   }
 
   return response.json()

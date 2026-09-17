@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { getTodos, type Todo } from '../services/todos'
 import KanbanColumn from '../components/KanbanColumn'
+import CreateTodoModal from '../components/CreateTodoModal'
 
 function DashboardPage() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   useEffect(() => {
     getTodos()
@@ -49,7 +51,10 @@ function DashboardPage() {
           <p>Manage your tasks and track your progress.</p>
         </div>
 
-        <button className="create-todo-button">
+        <button
+          className="create-todo-button"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
           + New Todo
         </button>
       </div>
@@ -70,6 +75,18 @@ function DashboardPage() {
           todos={doneTasks}
         />
       </div>
+
+      {isCreateModalOpen && (
+        <CreateTodoModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onTodoCreated={(newTodo) => {
+            setTodos((currentTodos) => [
+              ...currentTodos,
+              newTodo,
+            ])
+          }}
+        />
+      )}
     </main>
   )
 }
