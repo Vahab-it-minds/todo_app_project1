@@ -436,3 +436,19 @@ body {
 .logout-button:hover {
   border-color: #7c6ff7;
 }
+
+
+/* ========================================
+   Drop-Target
+======================================== */
+
+.kanban-column {
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.kanban-column-over {
+  border-color: #7c6ff7;
+  background: #160d36;
+}

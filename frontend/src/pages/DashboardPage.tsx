@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getTodos, type Todo } from '../services/todos'
+import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent, } from '@dnd-kit/core'
+import { getTodos, updateTodo, type Todo, type TodoStatus } from '../services/todos'
 import KanbanColumn from '../components/KanbanColumn'
 import CreateTodoModal from '../components/CreateTodoModal'
 import EditTodoModal from '../components/EditTodoModal'
@@ -13,6 +14,14 @@ function DashboardPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null)
   const navigate = useNavigate()
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  )
 
   useEffect(() => {
     getTodos()
@@ -39,6 +48,47 @@ function DashboardPage() {
   const doneTasks = todos.filter(
     (todo) => todo.status === 'Done'
   )
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+
+    if (!over) {
+      return
+    }
+
+    const todoId = Number(active.id)
+    const newStatus = over.id as TodoStatus
+
+    const todo = todos.find(
+      (todo) => todo.id === todoId
+    )
+
+    if (!todo || todo.status === newStatus) {
+      return
+    }
+
+    try {
+      const updatedTodo = await updateTodo(todo.id, {
+        title: todo.title,
+        description: todo.description,
+        dueDate: todo.dueDate,
+        priority: todo.priority,
+        timeEstimate: todo.timeEstimate,
+        category: todo.category,
+        status: newStatus,
+      })
+
+      setTodos((currentTodos) =>
+        currentTodos.map((currentTodo) =>
+          currentTodo.id === updatedTodo.id
+            ? updatedTodo
+            : currentTodo
+          )
+        )
+      } catch (error) {
+      console.error('Could not move todo.', error)
+    }
+  }
 
   async function handleLogout() {
     await logout()
@@ -81,25 +131,33 @@ function DashboardPage() {
         </div>
       </div>
 
-      <div className="kanban-board">
-        <KanbanColumn
-          title="To Do"
-          todos={todoTasks}
-          onTodoClick={setSelectedTodo}
-        />
+      <DndContext 
+        sensors={sensors}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="kanban-board">
+          <KanbanColumn
+            title="To Do"
+            status="Todo"
+            todos={todoTasks}
+            onTodoClick={setSelectedTodo}
+          />
 
-        <KanbanColumn
-          title="In Progress"
-          todos={inProgressTasks}
-          onTodoClick={setSelectedTodo}
-        />
+          <KanbanColumn
+            title="In Progress"
+            status="InProgress"
+            todos={inProgressTasks}
+            onTodoClick={setSelectedTodo}
+          />
 
-        <KanbanColumn
-          title="Done"
-          todos={doneTasks}
-          onTodoClick={setSelectedTodo}
-        />
-      </div>
+          <KanbanColumn
+            title="Done"
+            status="Done"
+            todos={doneTasks}
+            onTodoClick={setSelectedTodo}
+          />
+        </div>
+      </DndContext>
 
       {isCreateModalOpen && (
         <CreateTodoModal
