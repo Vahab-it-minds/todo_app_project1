@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { getTodos, type Todo } from '../services/todos'
 import KanbanColumn from '../components/KanbanColumn'
 import CreateTodoModal from '../components/CreateTodoModal'
+import EditTodoModal from '../components/EditTodoModal'
 
 function DashboardPage() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null)
 
   useEffect(() => {
     getTodos()
@@ -63,16 +65,19 @@ function DashboardPage() {
         <KanbanColumn
           title="To Do"
           todos={todoTasks}
+          onTodoClick={setSelectedTodo}
         />
 
         <KanbanColumn
           title="In Progress"
           todos={inProgressTasks}
+          onTodoClick={setSelectedTodo}
         />
 
         <KanbanColumn
           title="Done"
           todos={doneTasks}
+          onTodoClick={setSelectedTodo}
         />
       </div>
 
@@ -85,6 +90,29 @@ function DashboardPage() {
               newTodo,
             ])
           }}
+        />
+      )}
+
+      {selectedTodo && (
+        <EditTodoModal
+          todo={selectedTodo}
+          onClose={() => setSelectedTodo(null)}
+          onTodoUpdated={(updatedTodo) => {
+            setTodos((currentTodos) =>
+              currentTodos.map((todo) =>
+                todo.id === updatedTodo.id
+                  ? updatedTodo
+                  : todo
+              )
+            )
+         }}
+        onTodoDeleted={(deletedTodoId) => {
+          setTodos((currentTodos) =>
+            currentTodos.filter(
+              (todo) => todo.id !== deletedTodoId
+            )
+          )
+        }}
         />
       )}
     </main>

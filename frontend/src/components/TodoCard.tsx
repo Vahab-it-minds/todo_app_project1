@@ -2,11 +2,15 @@ import type { Todo } from '../services/todos'
 
 type TodoCardProps = {
   todo: Todo
+  onClick: () => void
 }
 
-function TodoCard({ todo }: TodoCardProps) {
+function TodoCard({ todo, onClick }: TodoCardProps) {
   return (
-    <article className="todo-card">
+    <article
+      className="todo-card"
+      onClick={onClick}
+    >
       <h3>{todo.title}</h3>
 
       {todo.description && (
@@ -19,7 +23,9 @@ function TodoCard({ todo }: TodoCardProps) {
         </span>
 
         {todo.category && (
-          <span className="todo-category">{todo.category}</span>
+          <span className="todo-category">
+            {todo.category}
+          </span>
         )}
       </div>
     </article>

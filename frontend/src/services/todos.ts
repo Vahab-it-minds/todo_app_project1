@@ -35,6 +35,16 @@ export type CreateTodoRequest = {
   category: string | null
 }
 
+export type UpdateTodoRequest = {
+  title: string
+  description: string | null
+  dueDate: string | null
+  priority: Priority
+  timeEstimate: number | null
+  category: string | null
+  status: TodoStatus
+}
+
 
 export async function getTodos(): Promise<Todo[]> {
   const response = await fetch(`${API_URL}/todos`, {
@@ -66,4 +76,36 @@ export async function createTodo(
   }
 
   return response.json()
+}
+
+
+export async function updateTodo(
+  id: number,
+  todo: UpdateTodoRequest
+): Promise<Todo> {
+  const response = await fetch(`${API_URL}/todos/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(todo),
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to update todo.')
+  }
+
+  return response.json()
+}
+
+export async function deleteTodo(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/todos/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to delete todo.')
+  }
 }

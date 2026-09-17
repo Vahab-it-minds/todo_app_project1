@@ -13,7 +13,7 @@ namespace backend.repositories
             this.database = database;
         }
 
-        public async Task CreateTodo(Todo todo)
+        public async Task<int> CreateTodo(Todo todo)
         {
             await using var connection = await database.GetConnection();
 
@@ -41,7 +41,9 @@ namespace backend.repositories
             command.Parameters.AddWithValue("@Status", todo.Status.ToString());
 
             
-            await command.ExecuteNonQueryAsync();
+            var result = await command.ExecuteScalarAsync();
+
+            return Convert.ToInt32(result);
         }
 
         public async Task<Todo?> GetTodoById(int id)

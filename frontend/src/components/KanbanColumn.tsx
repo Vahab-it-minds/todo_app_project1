@@ -4,9 +4,10 @@ import TodoCard from './TodoCard'
 type KanbanColumnProps = {
   title: string
   todos: Todo[]
+  onTodoClick: (todo: Todo) => void
 }
 
-function KanbanColumn({ title, todos }: KanbanColumnProps) {
+function KanbanColumn({ title, todos, onTodoClick, }: KanbanColumnProps) {
   return (
     <section className="kanban-column">
       <div className="kanban-column-header">
@@ -19,6 +20,7 @@ function KanbanColumn({ title, todos }: KanbanColumnProps) {
           <TodoCard
             key={todo.id}
             todo={todo}
+            onClick={() => onTodoClick(todo)}
           />
         ))}
       </div>

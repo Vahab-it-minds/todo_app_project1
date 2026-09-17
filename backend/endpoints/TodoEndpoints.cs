@@ -77,9 +77,11 @@ namespace backend.endpoints
                     TodoStatus.Todo
                 );
 
-                await todoRepository.CreateTodo(todo);
+                var todoId = await todoRepository.CreateTodo(todo);
 
-                return Results.Ok(todo);
+                var createdTodo = await todoRepository.GetTodoById(todoId);
+
+                return Results.Ok(createdTodo);
             })
             .RequireAuthorization();
 
