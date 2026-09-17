@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { login } from '../services/auth'
 
@@ -9,7 +9,7 @@ function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
   event.preventDefault()
   setError('')
 
@@ -61,7 +61,10 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       </form>
 
       <p>
-        Don't have an account? <a href="#">Sign up</a>
+        Don't have an account?{' '}
+        <Link to ="/signup">
+          Sign up
+        </Link>
       </p>
     </div>
   )
