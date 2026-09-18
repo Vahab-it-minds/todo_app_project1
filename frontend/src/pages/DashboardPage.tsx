@@ -4,7 +4,7 @@ import { getTodos, updateTodo, type Todo, type TodoStatus } from '../services/to
 import KanbanColumn from '../components/KanbanColumn'
 import CreateTodoModal from '../components/CreateTodoModal'
 import EditTodoModal from '../components/EditTodoModal'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { logout } from '../services/auth'
 
 function DashboardPage() {
@@ -83,9 +83,9 @@ function DashboardPage() {
           currentTodo.id === updatedTodo.id
             ? updatedTodo
             : currentTodo
-          )
         )
-      } catch (error) {
+      )
+    } catch (error) {
       console.error('Could not move todo.', error)
     }
   }
@@ -115,6 +115,10 @@ function DashboardPage() {
         </div>
 
         <div className="kanban-header-actions">
+          <Link to="/profile" className="profile-button">
+            Profile
+          </Link>
+
           <button
             className="logout-button"
             onClick={handleLogout}
@@ -123,7 +127,7 @@ function DashboardPage() {
           </button>
 
           <button
-            className="create-todo-button"
+            className="new-todo-button"
             onClick={() => setIsCreateModalOpen(true)}
           >
             + New Todo
@@ -131,7 +135,7 @@ function DashboardPage() {
         </div>
       </div>
 
-      <DndContext 
+      <DndContext
         sensors={sensors}
         onDragEnd={handleDragEnd}
       >
@@ -183,14 +187,14 @@ function DashboardPage() {
                   : todo
               )
             )
-         }}
-        onTodoDeleted={(deletedTodoId) => {
-          setTodos((currentTodos) =>
-            currentTodos.filter(
-              (todo) => todo.id !== deletedTodoId
+          }}
+          onTodoDeleted={(deletedTodoId) => {
+            setTodos((currentTodos) =>
+              currentTodos.filter(
+                (todo) => todo.id !== deletedTodoId
+              )
             )
-          )
-        }}
+          }}
         />
       )}
     </main>

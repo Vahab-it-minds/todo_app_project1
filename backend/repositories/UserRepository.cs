@@ -18,7 +18,7 @@ namespace backend.repositories
         {
             await using var connection = await database.GetConnection();
 
-            const string sql ="""
+            const string sql = """
                 INSERT INTO users (name, email, password)
                 VALUES (@Name, @Email, @Password);
             """;
@@ -53,7 +53,8 @@ namespace backend.repositories
                 var email = reader.GetString(2);
 
                 return new User(userId, name, email);
-            }else
+            }
+            else
             {
                 return null;
             }
@@ -68,13 +69,13 @@ namespace backend.repositories
             FROM users;
             """;
 
-            await using var command= new NpgsqlCommand(sql, connection);
+            await using var command = new NpgsqlCommand(sql, connection);
 
             await using var reader = await command.ExecuteReaderAsync();
-            
+
             var users = new List<User>();
 
-            while(await reader.ReadAsync())
+            while (await reader.ReadAsync())
             {
                 var id = reader.GetInt32(0);
                 var name = reader.GetString(1);
@@ -97,7 +98,7 @@ namespace backend.repositories
             """;
 
             await using var command = new NpgsqlCommand(sql, connection);
-            
+
             command.Parameters.AddWithValue("@email", email);
 
             await using var reader = await command.ExecuteReaderAsync();
@@ -117,25 +118,55 @@ namespace backend.repositories
             }
         }
 
-        public async Task UpdateUser(User user)
+
+        public async Task UpdateProfile(
+            int userId,
+            string name,
+            string email)
         {
             await using var connection = await database.GetConnection();
 
             const string sql = """
                 UPDATE users
-                SET name = @name, email = @email, password = @password
-                WHERE id = @id;
-            """; 
+                SET name = @Name,
+                email = @Email
+                WHERE id = @Id;
+                """;
 
-            await using var command = new NpgsqlCommand(sql, connection);
+            await using var command =
+                new NpgsqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@id", user.Id);
-            command.Parameters.AddWithValue("@name", user.Name);
-            command.Parameters.AddWithValue("@email", user.Email);
-            command.Parameters.AddWithValue("@password", user.Password!);
+            command.Parameters.AddWithValue("@Id", userId);
+            command.Parameters.AddWithValue("@Name", name);
+            command.Parameters.AddWithValue("@Email", email);
 
             await command.ExecuteNonQueryAsync();
         }
+
+        public async Task UpdatePassword(
+            int userId,
+            string hashedPassword)
+        {
+            await using var connection = await database.GetConnection();
+
+            const string sql = """
+                UPDATE users
+                SET password = @Password
+                WHERE id = @Id;
+                """;
+
+            await using var command =
+                new NpgsqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@Id", userId);
+            command.Parameters.AddWithValue(
+                "@Password",
+                hashedPassword
+            );
+
+            await command.ExecuteNonQueryAsync();
+        }
+
 
         public async Task DeleteUser(int id)
         {
@@ -153,7 +184,7 @@ namespace backend.repositories
             await command.ExecuteNonQueryAsync();
         }
 
-        public async Task<bool> EmailExists(string email)
+        public async Task<bool> EmailExists(string email, int? excludeUserId = null)
         {
             await using var connection = await database.GetConnection();
 
@@ -162,14 +193,35 @@ namespace backend.repositories
                     SELECT 1
                     FROM users
                 WHERE email = @Email
+                    AND (@ExcludeUserId Is NULL OR id != @ExcludeUserId)
             );
             """;
 
             await using var command = new NpgsqlCommand(sql, connection);
 
             command.Parameters.AddWithValue("@Email", email);
+            command.Parameters.AddWithValue("@ExcludeUserId", (object?)excludeUserId ?? DBNull.Value);
 
             return (bool)(await command.ExecuteScalarAsync())!;
+        }
+
+        public async Task<string?> GetPasswordHashByUserId(int userId)
+        {
+            await using var connection = await database.GetConnection();
+
+            const string sql = """
+                SELECT password
+                FROM users
+                WHERE id = @UserId;
+                """;
+
+            await using var command = new NpgsqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@UserId", userId);
+
+            var result = await command.ExecuteScalarAsync();
+
+            return result as string;
         }
     }
 
